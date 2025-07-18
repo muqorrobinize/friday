@@ -14,7 +14,7 @@ compatibility_date = "2024-05-01"
 # Sintaks ini secara khusus memberitahu Pages untuk menyediakan
 # layanan Workers AI dan menempatkannya di bawah `env.AI`
 # di dalam kode functions/api.js Anda.
-# Ini akan memperbaiki error "Could not resolve '@cloudflare/ai'"
-# karena build system sekarang tahu bahwa modul itu disediakan oleh platform.
-[[ai]]
+# Menggunakan [ai] (satu kurung siku) mendefinisikannya sebagai objek,
+# sesuai dengan pesan error.
+[ai]
 binding = "AI"
