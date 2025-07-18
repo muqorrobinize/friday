@@ -1,0 +1,11 @@
+{
+  "name": "friday-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/api.js --bundle --outfile=public/_worker.js --format=esm --external:@cloudflare/ai"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  }
+}
