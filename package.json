@@ -1,0 +1,11 @@
+{
+  "name": "friday-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:functions": "wrangler pages functions build --functions ./functions --outfile public/_worker.js --external:@cloudflare/ai"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
