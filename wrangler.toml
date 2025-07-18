@@ -1,0 +1,17 @@
+# Nama proyek Anda di Cloudflare.
+# Ini akan menjadi bagian dari URL *.pages.dev Anda.
+name = "friday-ai"
+
+# Memberi tahu Cloudflare bahwa file frontend (HTML, CSS, JS)
+# berada di dalam folder 'public'.
+pages_build_output_dir = "public"
+
+# Bagian ini mengkonfigurasi runtime untuk backend (Worker) Anda.
+[[runtimes]]
+[runtimes.bindings]
+  # Mengaktifkan dan memberi nama 'AI' pada layanan Workers AI.
+  # Dengan ini, Anda bisa memanggil layanan AI dari dalam kode Worker
+  # menggunakan `env.AI`. Ini adalah langkah kunci untuk mengaktifkan
+  # model bahasa (LLM) dan Text-to-Speech.
+  [runtimes.services.AI]
+  binding_type = "Ai"
