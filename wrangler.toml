@@ -10,18 +10,11 @@ pages_build_output_dir = "public"
 # terbaru yang kompatibel dengan fitur-fitur modern seperti Workers AI.
 compatibility_date = "2024-05-01"
 
-# Menambahkan konfigurasi build untuk mengatasi error
-[build]
-# Secara eksplisit memberitahu bundler untuk tidak menyertakan modul @cloudflare/ai,
-# karena modul ini sudah disediakan oleh lingkungan Cloudflare.
-external = ["@cloudflare/ai"]
-
-# Bagian ini mengkonfigurasi runtime untuk backend (Worker) Anda.
-[[runtimes]]
-[runtimes.bindings]
-  # Mengaktifkan dan memberi nama 'AI' pada layanan Workers AI.
-  # Dengan ini, Anda bisa memanggil layanan AI dari dalam kode Worker
-  # menggunakan `env.AI`. Ini adalah langkah kunci untuk mengaktifkan
-  # model bahasa (LLM) dan Text-to-Speech.
-  [runtimes.services.AI]
-  binding_type = "Ai"
+# CARA YANG BENAR UNTUK MENGAKTIFKAN AI DI PAGES FUNCTIONS
+# Sintaks ini secara khusus memberitahu Pages untuk menyediakan
+# layanan Workers AI dan menempatkannya di bawah `env.AI`
+# di dalam kode functions/api.js Anda.
+# Ini akan memperbaiki error "Could not resolve '@cloudflare/ai'"
+# karena build system sekarang tahu bahwa modul itu disediakan oleh platform.
+[[ai]]
+binding = "AI"
