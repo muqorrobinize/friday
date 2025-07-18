@@ -1,6 +1,6 @@
 import { Ai } from '@cloudflare/ai';
 
-export async function onRequestPost(context) {
+export async function onRequest(context) {
     const { request, env } = context;
     // Ambil data dari request frontend, termasuk riwayat pesan dan status tombol
     const { messages, enableSearch, enableVoice } = await request.json();
