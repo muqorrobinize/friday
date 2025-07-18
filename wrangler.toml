@@ -1,20 +1,3 @@
-# Nama proyek Anda di Cloudflare.
-# Ini akan menjadi bagian dari URL *.pages.dev Anda.
 name = "friday"
-
-# Memberi tahu Cloudflare bahwa file frontend (HTML, CSS, JS)
-# berada di dalam folder 'public'.
 pages_build_output_dir = "public"
-
-# PENTING: Baris ini memberitahu Cloudflare untuk menggunakan versi build
-# terbaru yang kompatibel dengan fitur-fitur modern seperti Workers AI.
 compatibility_date = "2024-05-01"
-
-# CARA YANG BENAR UNTUK MENGAKTIFKAN AI DI PAGES FUNCTIONS
-# Sintaks "Service Binding" ini secara eksplisit memberitahu Cloudflare
-# untuk menghubungkan ke layanan "workers-ai" dan menamakannya "AI".
-# Ini adalah cara yang paling benar dan akan memperbaiki error
-# "Could not resolve '@cloudflare/ai'".
-[[services]]
-binding = "AI"
-service = "workers-ai"
