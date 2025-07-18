@@ -11,10 +11,9 @@ pages_build_output_dir = "public"
 compatibility_date = "2024-05-01"
 
 # CARA YANG BENAR UNTUK MENGAKTIFKAN AI DI PAGES FUNCTIONS
-# Sintaks ini secara khusus memberitahu Pages untuk menyediakan
-# layanan Workers AI dan menempatkannya di bawah `env.AI`
-# di dalam kode functions/api.js Anda.
-# Menggunakan [ai] (satu kurung siku) mendefinisikannya sebagai objek,
-# sesuai dengan pesan error.
-[ai]
+# Sintaks "Service Binding" ini secara eksplisit memberitahu Cloudflare
+# untuk menghubungkan ke layanan "workers-ai" dan menamakannya "AI".
+# Ini akan memperbaiki error "Could not resolve '@cloudflare/ai'".
+[[services]]
 binding = "AI"
+service = "workers-ai"
