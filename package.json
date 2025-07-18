@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build:functions": "wrangler pages functions build --functions ./functions --outfile public/_worker.js --external:@cloudflare/ai"
+    "build": "esbuild functions/api.js --bundle --outfile=public/_worker.js --format=esm --external:@cloudflare/ai"
   },
   "devDependencies": {
-    "wrangler": "^3.0.0"
+    "esbuild": "^0.20.0"
   }
 }
