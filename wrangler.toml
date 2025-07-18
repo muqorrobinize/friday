@@ -13,7 +13,8 @@ compatibility_date = "2024-05-01"
 # CARA YANG BENAR UNTUK MENGAKTIFKAN AI DI PAGES FUNCTIONS
 # Sintaks "Service Binding" ini secara eksplisit memberitahu Cloudflare
 # untuk menghubungkan ke layanan "workers-ai" dan menamakannya "AI".
-# Ini akan memperbaiki error "Could not resolve '@cloudflare/ai'".
+# Ini adalah cara yang paling benar dan akan memperbaiki error
+# "Could not resolve '@cloudflare/ai'".
 [[services]]
 binding = "AI"
 service = "workers-ai"
