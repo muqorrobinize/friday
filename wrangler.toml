@@ -1,10 +1,15 @@
 # Nama proyek Anda di Cloudflare.
 # Ini akan menjadi bagian dari URL *.pages.dev Anda.
-name = "friday-ai"
+name = "friday"
 
 # Memberi tahu Cloudflare bahwa file frontend (HTML, CSS, JS)
 # berada di dalam folder 'public'.
 pages_build_output_dir = "public"
+
+# PENTING: Baris ini memberitahu Cloudflare untuk menggunakan versi build
+# terbaru yang kompatibel dengan fitur-fitur modern seperti Workers AI.
+# Ini akan memperbaiki error "Could not resolve '@cloudflare/ai'".
+compatibility_date = "2024-05-01"
 
 # Bagian ini mengkonfigurasi runtime untuk backend (Worker) Anda.
 [[runtimes]]
