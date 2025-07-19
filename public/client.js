@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let fullAiResponse = '';
 
         try {
-            const response = await fetch('/api', {
+            const response = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 // Kirim seluruh riwayat percakapan dan status tombol ke backend
