@@ -1,32 +1,46 @@
-import { Ai } from '@cloudflare/ai';
+// TIDAK LAGI MENGIMPOR Ai DARI @cloudflare/ai
+// import { Ai } from '@cloudflare/ai';
 
-// Ini adalah handler utama yang akan dijalankan oleh Cloudflare
 export default {
   async fetch(request, env, ctx) {
-    // Dapatkan URL dari permintaan untuk memeriksa path-nya
     const url = new URL(request.url);
-
-    // ROUTER: Jika ini adalah permintaan POST ke halaman utama,
-    // maka ini adalah panggilan API kita.
     if (request.method === 'POST' && url.pathname === '/') {
       return handleApiRequest(request, env);
     }
-
-    // Jika bukan, maka ini adalah permintaan untuk aset statis
-    // (seperti index.html, client.js, atau file CSS).
-    // Biarkan platform Cloudflare yang menanganinya.
     return env.ASSETS.fetch(request);
   }
 };
 
-// SEMUA KODE LAMA ANDA SEKARANG ADA DI DALAM FUNGSI INI
+// Fungsi pembantu untuk memanggil API Cloudflare AI
+async function runAi(env, model, inputs) {
+  const apiUrl = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/ai/run/${model}`;
+  
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(inputs)
+  });
+  
+  // Jika model text-to-speech, kembalikan stream langsung
+  if (model.includes('speech-synthesis')) {
+      return response.body;
+  }
+  
+  // Jika model teks, kembalikan stream
+  return response.body;
+}
+
+
 async function handleApiRequest(request, env) {
     const { messages, enableSearch, enableVoice } = await request.json();
-    const ai = new Ai(env.AI);
+    // const ai = new Ai(env.AI); // TIDAK DIGUNAKAN LAGI
 
     const lastUserPrompt = messages[messages.length - 1].content;
 
-    // --- BAGIAN PENCARIAN INTERNET (KONDISIONAL) ---
+    // --- BAGIAN PENCARIAN INTERNET (Tidak ada perubahan) ---
     let contextMessage = "No search results found.";
     if (enableSearch && env.SERPAPI_API_KEY) {
         try {
@@ -37,10 +51,8 @@ async function handleApiRequest(request, env) {
                 gl: 'id',
                 hl: 'id'
             });
-            
             const searchResponse = await fetch(`https://serpapi.com/search.json?${params.toString()}`);
             const searchResults = await searchResponse.json();
-            
             if (searchResults.organic_results && searchResults.organic_results.length > 0) {
                 contextMessage = searchResults.organic_results.slice(0, 3).map(r => `Title: ${r.title}, Snippet: ${r.snippet}`).join('\n\n');
             }
@@ -71,8 +83,9 @@ async function handleApiRequest(request, env) {
     const writeData = (data) => {
         return writer.write(textEncoder.encode(JSON.stringify(data) + '\n'));
     };
-
-    const llmStream = await ai.run('@cf/meta/llama-3-8b-instruct', {
+    
+    // --- PERUBAHAN UTAMA: CARA MEMANGGIL AI ---
+    const llmStream = await runAi(env, '@cf/meta/llama-3-8b-instruct', {
         messages: messagesWithSystemPrompt,
         stream: true
     });
@@ -82,16 +95,28 @@ async function handleApiRequest(request, env) {
 
         const textPromise = (async () => {
             const reader = llmStreamForText.getReader();
+            const textDecoder = new TextDecoder();
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
-                const decodedText = new TextDecoder().decode(value);
-                await writeData({ type: 'text', content: decodedText });
+                // Respons dari API HTTP sedikit berbeda, perlu di-decode
+                const decodedChunk = textDecoder.decode(value, { stream: true });
+                const jsonLines = decodedChunk.split('\n');
+                for (const line of jsonLines) {
+                    if (line.startsWith('data: ')) {
+                        const jsonString = line.substring(6);
+                        if (jsonString.trim() === '[DONE]') continue;
+                        try {
+                           const parsed = JSON.parse(jsonString);
+                           await writeData({ type: 'text', content: parsed.response });
+                        } catch (e) {}
+                    }
+                }
             }
         })();
 
         const audioPromise = (async () => {
-            const ttsStream = await ai.run('@cf/elevenlabs/speech-synthesis-with-speechmarks', {
+            const ttsStream = await runAi(env, '@cf/elevenlabs/speech-synthesis-with-speechmarks', {
                 text: llmStreamForTTS,
                 voice_id: 'Rachel'
             });
@@ -109,11 +134,23 @@ async function handleApiRequest(request, env) {
     } else {
         const processTextOnly = async () => {
             const reader = llmStream.getReader();
+            const textDecoder = new TextDecoder();
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
-                const decodedText = new TextDecoder().decode(value);
-                await writeData({ type: 'text', content: decodedText });
+                // Respons dari API HTTP sedikit berbeda, perlu di-decode
+                const decodedChunk = textDecoder.decode(value, { stream: true });
+                const jsonLines = decodedChunk.split('\n');
+                for (const line of jsonLines) {
+                     if (line.startsWith('data: ')) {
+                        const jsonString = line.substring(6);
+                        if (jsonString.trim() === '[DONE]') continue;
+                        try {
+                           const parsed = JSON.parse(jsonString);
+                           await writeData({ type: 'text', content: parsed.response });
+                        } catch (e) {}
+                    }
+                }
             }
             writer.close();
         };
